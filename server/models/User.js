@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: "userid",
             onDelete: "cascade"
         });
+        User.hasMany(models.Weight, {
+            foreignKey: "userid",
+            onDelete: "cascade"
+        });
     };
 
     return User;

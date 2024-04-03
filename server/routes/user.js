@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const bcrypt = require("bcrypt");
-const { User, bloodPressure } = require("../models");
+const { User, bloodPressure, Weight } = require("../models");
 const yup = require("yup");
 const { sign } = require("jsonwebtoken");
 require("dotenv").config();
 const { validateToken } = require("../middlewares/auth");
-// const { bloodPressure } = require("../models/");
+
 
 const emailRegex = /^[\w-]+(?:\.[\w-]+)*@(?:[\w-]+\.)+[a-zA-Z]{2,7}$/;
 const NRICRegex = /^[STMGstmg]\d{7}[A-Za-z]$/;
@@ -190,6 +190,78 @@ router.post("/addBloodPressure", async (req, res) => {
     res.status(400).json({ errors: err.errors });
   }
 });
+
+// Get weight data by NRIC
+router.get("/getWeight/:nric", async (req, res) => {
+  const userNRIC = req.params.nric;
+
+  try {
+    const weightData = await Weight.findAll({
+      where: { NRIC: userNRIC },
+      attributes: ['userid', 'weightValue', 'heightValue', 'BMI', 'measureDate'], // Include necessary attributes
+    });
+
+    res.json(weightData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch weight data." });
+  }
+});
+//get user height
+router.get("/getUserHeight/:nric", async (req, res) => {
+  const userNRIC = req.params.nric;
+  
+  try {
+    const latestHeightData = await Weight.findOne({
+      where: { NRIC: userNRIC },
+      attributes: ['heightValue'],
+      order: [['measureDate', 'DESC']], // Order by measureDate in descending order to get the latest height data
+    });
+
+    if (latestHeightData) {
+      res.json({ heightValue: latestHeightData.heightValue });
+    } else {
+      res.status(404).json({ message: "No height data found for the user." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch height data." });
+  }
+});
+
+
+// Add weight data
+router.post("/addWeight", async (req, res) => {
+  let data = req.body;
+
+  // Validate request body
+  let validationSchema = yup.object({
+    NRIC: yup.string().required(), // Validate NRIC as a required string
+    weightValue: yup.number().required(), // Validate weightValue as a required number
+    heightValue: yup.number().required(), // Validate heightValue as a required number
+    BMI: yup.string().required(), // Validate BMI as a required string
+    measureDate: yup.date().required(), // Validate measureDate as a required date
+  });
+
+  try {
+    data = await validationSchema.validate(data, { abortEarly: false });
+
+    // Create a new weight record
+    const newWeight = await Weight.create({
+      NRIC: data.NRIC,
+      weightValue: data.weightValue,
+      heightValue: data.heightValue,
+      BMI: data.BMI,
+      measureDate: data.measureDate,
+    });
+
+    res.json({ message: "Weight record added successfully.", newWeight });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ errors: err.errors });
+  }
+});
+
 
 router.get("getUserByID/:id", validateToken, async (req, res) => {
   let id = req.params.id;

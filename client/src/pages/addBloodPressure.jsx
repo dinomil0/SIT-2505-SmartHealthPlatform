@@ -50,21 +50,7 @@ function AddBloodPressure() {
       <Typography variant="h5" sx={{ my: 2 }}>
         Add Blood Pressure
       </Typography>
-      <Box
-        component="form"
-        sx={{ maxWidth: "500px" }}
-        onSubmit={formik.handleSubmit}
-      >
-        {/* <TextField
-          fullWidth
-          margin="dense"
-          autoComplete="off"
-          label="UserID"
-          name="userid"
-          type="text"
-          value={formik.values.userid}
-          disabled // Disable editing of userid field since it's automatically populated
-        /> */}
+      <Box component="form" sx={{ maxWidth: "500px" }} onSubmit={formik.handleSubmit}>
         <TextField
           fullWidth
           margin="dense"
@@ -96,7 +82,7 @@ function AddBloodPressure() {
           margin="dense"
           autoComplete="off"
           label="Date"
-          name="date"
+          name="measureDate"
           type="date"
           value={formik.values.measureDate}
           onChange={formik.handleChange}
@@ -104,6 +90,7 @@ function AddBloodPressure() {
           error={formik.touched.measureDate && Boolean(formik.errors.measureDate)}
           helperText={formik.touched.measureDate && formik.errors.measureDate}
           InputLabelProps={{ shrink: true }}
+          inputProps={{ max: today }} // Set the max attribute to today's date
         />
         <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
           Add Blood Pressure

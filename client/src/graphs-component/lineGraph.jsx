@@ -1,82 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import moment from 'moment'; // Import moment for date formatting
+import moment from 'moment';
 import http from '../http'; // Assuming you have configured HTTP client
-import { da, faker } from '@faker-js/faker'; // Remove if not needed
+import { faker } from '@faker-js/faker'; // Import faker-js/faker for generating random data
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const chartOptions =
-{
-    responsive: true,
-    plugins:
-    {
-        legend:
-        {
-            position: 'bottom',
-        },
-        title:
-        {
-            display: true,
-            text: 'Blood Pressure by day',
-        },
-        tooltips:
-        {
-            callbacks:
-            {
-                title: function (tooltipItem, data) {
-                    const index = tooltipItem[0].index;
-                    const date = moment(data.labels[index], 'YYYY-MM-DD').format('DD MMM');
-                    return date;
-                },
-                label: function (tooltipItem, data) {
-                    const dataset = data.datasets[tooltipItem.datasetIndex];
-                    const label = dataset.label;
-                    const value = dataset.data[tooltipItem.index];
-                    const sign = value >= 0 ? '+' : '';
-
-                    if (label === 'Systolic' || label === 'Diastolic') {
-                        return `${label}: ${sign}${value.toFixed(2)}`;
-                    }
-                    return '';
-                },
-            },
-            backgroundColor: "#FAFAFA",
-            borderColor: "lightgreen",
-            borderWidth: 1,
-            titleFontColor: "black",
-            titleFontStyle: "bold",
-            displayColors: false,
-            bodyFontColor: "black"
-        }
-    },
-    plugins:
-    {
-        fillRange:
-        {
-            beforeDraw(chart) {
-                const ctx = chart.ctx;
-                const xAxis = chart.scales['x'];
-                const yAxis = chart.scales['y'];
-                const startRange = moment('2024-03-22', 'YYYY-MM-DD');
-                const endRange = moment('2024-03-25', 'YYYY-MM-DD');
-
-                const startX = xAxis.getPixelForValue(startRange);
-                const endX = xAxis.getPixelForValue(endRange);
-                const startY = yAxis.top;
-                const endY = yAxis.bottom;
-
-                ctx.save();
-                ctx.fillStyle = 'rgba(255, 99, 132, 0.2)';
-                ctx.fillRect(startX, startY, endX - startX, endY - startY);
-                ctx.restore();
-            }
-        }
-    }
-};
-
-const LineGraph = ({ NRIC }) => {
+const BloodPressureGraph = ({ NRIC }) => {
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [
@@ -95,19 +26,61 @@ const LineGraph = ({ NRIC }) => {
         ],
     });
 
-
+    const [chartOptions, setChartOptions] = useState({
+        responsive: true,
+        scales: {
+            y: {
+                suggestedMin: 60,
+                suggestedMax: 140,
+            },
+        },
+        plugins: {
+            legend: {
+                position: 'right',
+            },
+            title: {
+                display: true,
+                text: 'Blood Pressure by day',
+            },
+            tooltips: {
+                intersect: false,
+            },
+            annotation: {
+                annotations: [],
+            },
+        },
+    });
 
     useEffect(() => {
-        const fetchBloodPressureData = async () => {
+        const fetchData = async () => {
             try {
                 const response = await http.get(`user/getBloodPressure/${NRIC}`);
                 const bloodPressureData = response.data;
 
-                const labels = bloodPressureData.map((bp) => moment(bp.measureDate).format('DD MMM YYYY'));
-                const systolicData = bloodPressureData.map((bp) => bp.systolic);
-                const diastolicData = bloodPressureData.map((bp) => bp.diastolic);
+                console.log('Blood Pressure Data:', bloodPressureData);
 
-                // Update chart data state with fetched data
+                const labels = [];
+                const systolicData = [];
+                const diastolicData = [];
+
+                for (let i = 20; i >= 0; i--) {
+                    const date = moment().subtract(i, 'days').format('DD MMM');
+                    labels.push(date);
+
+                    // Check if real data exists for the date
+                    const dataPoint = bloodPressureData.find((record) => moment(record.measureDate).format('DD MMM') === date);
+                    if (dataPoint) {
+                        systolicData.push(dataPoint.systolic);
+                        diastolicData.push(dataPoint.diastolic);
+                    } else {
+                        // Generate random data within specified ranges for mock data
+                        const systolicValue = faker.datatype.number({ min: 100, max: 120 });
+                        const diastolicValue = faker.datatype.number({ min: 70, max: 80 });
+                        systolicData.push(systolicValue);
+                        diastolicData.push(diastolicValue);
+                    }
+                }
+
                 setChartData({
                     labels,
                     datasets: [
@@ -125,20 +98,47 @@ const LineGraph = ({ NRIC }) => {
                         },
                     ],
                 });
+
+                // Add annotation for threshold line
+                const annotations = [
+                    {
+                        type: 'line',
+                        mode: 'horizontal',
+                        scaleID: 'y',
+                        value: 120, // Threshold value for prehypertension
+                        borderColor: 'rgba(255, 206, 86, 0.7)',
+                        borderWidth: 2,
+                        label: {
+                            enabled: true,
+                            content: 'Prehypertension',
+                            position: 'center',
+                        },
+                    },
+                ];
+
+                setChartOptions({
+                    ...chartOptions,
+                    plugins: {
+                        ...chartOptions.plugins,
+                        annotation: {
+                            ...chartOptions.plugins.annotation,
+                            annotations,
+                        },
+                    },
+                });
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
 
-        fetchBloodPressureData();
-    }, [NRIC]); // Empty dependency array to run effect only once on component mount
+        fetchData();
+    }, [NRIC]); // Dependency array with NRIC as a dependency for useEffect
 
     return (
         <div>
-        <Line data={chartData} options={chartOptions} />
+            <Line data={chartData} options={chartOptions} />
         </div>
-        
     );
 };
 
-export default LineGraph;
+export default BloodPressureGraph;

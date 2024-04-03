@@ -7,9 +7,9 @@
 .SingpassBtn {
   background: #F05F40;
   background: -moz-linear-gradient(left, #3996f4 0%, #5d5ffa 100%);
-  background: -webkit-linear-gradient(left, #F05F40 0%,#fa9e5d 100%);
+  background: -webkit-linear-gradient(left, #F05F40 0%, #fa9e5d 100%);
   background: linear-gradient(to right, #F05F40 0%, #fa9e5d 51%, #F05F40 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F05F40', endColorstr='#fa9e5d',GradientType=1 );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F05F40', endColorstr='#fa9e5d', GradientType=1);
   background-size: 200% auto;
   border: medium none;
   border-radius: 3px;
