@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, Box } from '@mui/material';
+import React, { useState, useEffect, } from 'react';
+import { Container, AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Grid } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import MyTheme from './themes/MyTheme';
 import SignUp from './pages/Signup';
@@ -9,12 +9,14 @@ import AddBloodPressure from './pages/addBloodPressure';
 import AddWeight from './pages/addWeight';
 import UserContext from "./contexts/UserContext";
 import http from "./http";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import Home from './pages/Home'; // Import the Home component
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'; // Import the ArrowDropDownIcon
 
 function App() {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  // const navigate = useNavigate();
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -36,11 +38,12 @@ function App() {
     // Perform logout logic here
     setUser(null);
     setAnchorEl(null);
+    // navigate('/'); // Use navigate within the Router context
   };
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-      <Router>
+      <Router> {/* Ensure Router is set up properly */}
         <ThemeProvider theme={MyTheme}>
           <AppBar position="static" className='AppBar'>
             <Container>
@@ -51,30 +54,37 @@ function App() {
                   </Typography>
                 </Link>
                 {user && (
-                  <Box >
-                    <IconButton
-                      edge="end"
-                      color="inherit"
-                      aria-label="menu"
-                      aria-controls="profile-menu"
-                      aria-haspopup="true"
-                      onClick={handleMenuOpen}
-                    >
-                      <Typography variant="body1" style={{ marginRight: '8px' }}>
-                        Welcome back, {user.name}
-                      </Typography>
-                    </IconButton>
-                    <Menu
-                      id="profile-menu"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-                      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                    </Menu>
-                  </Box>
+                  // <Container>
+                    <Grid container alignItems="center" justifyContent='flex-end' >
+                      <Grid item >
+                        <Typography variant="body1" style={{ marginRight: '3px' }}>
+                         Welcome, {user.name}
+                        </Typography>
+                      </Grid>
+                      <Grid item >
+                        <IconButton
+                          edge="end"
+                          color="inherit"
+                          aria-label="menu"
+                          aria-controls="profile-menu"
+                          aria-haspopup="true"
+                          onClick={handleMenuOpen}
+                        >
+                          <ArrowDropDownIcon />
+                        </IconButton>
+                        <Menu
+                          id="profile-menu"
+                          anchorEl={anchorEl}
+                          keepMounted
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+                          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                        </Menu>
+                      </Grid>
+                    </Grid>
+                  // </Container>
                 )}
               </Toolbar>
             </Container>

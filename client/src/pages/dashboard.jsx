@@ -17,35 +17,14 @@ function dashboard() {
     const { user } = useContext(UserContext);
     const batteryPercentage = 85;
     return (
-        <Box mt={5} mb={3}>
-            <Grid container>
-                <Grid container item>
-                    < Grid item xs={11} >
-                        <Button component={Link} to={"/addBloodPressure"} variant="contained" size="small" startIcon={<AddIcon />}>
-                            Add blood pressure record
-                        </Button>
-                    </Grid>
-                    <Grid item xs>
-                        <BatteryIcon percentage={batteryPercentage} />
-                    </Grid>
-                </Grid>
-                <Grid item md>
-                    <LineGraph NRIC={user.NRIC}></LineGraph>
-                </Grid>
-            </Grid>
-            <Grid container item>
-                    < Grid item xs={11} >
-                        <Button component={Link} to={"/addWeight"} variant="contained" size="small" startIcon={<AddIcon />}>
-                            Add Weight record
-                        </Button>
-                    </Grid>
-                    <Grid item xs>
-                        <BatteryIcon percentage={batteryPercentage} />
-                    </Grid>
-                </Grid>
-            <Grid item md>
+        <Box mt={2} color="grey">
+            <Grid m={2}>
                 <WeightlineGraph NRIC={user.NRIC}></WeightlineGraph>
             </Grid>
+            <Grid m={2}>
+                <LineGraph NRIC={user.NRIC}></LineGraph>
+            </Grid>
+            
         </Box>
     );
 };

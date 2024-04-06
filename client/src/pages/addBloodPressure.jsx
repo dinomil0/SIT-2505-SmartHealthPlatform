@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import { Box, Typography, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -8,14 +8,13 @@ import UserContext from "../contexts/UserContext";
 
 function AddBloodPressure() {
   const navigate = useNavigate();
-
   const { user } = useContext(UserContext);
-
   const today = new Date().toISOString().split("T")[0]; // Get today's date in yyyy-mm-dd format
-  console.log(today)
+
+  const [openDialog, setOpenDialog] = React.useState(false); // State variable for dialog visibility
+
   const formik = useFormik({
     initialValues: {
-      // userid: user.id, // Set the initial value for userid using the user's ID from context
       NRIC: user.NRIC,
       systolic: "",
       diastolic: "",
@@ -37,6 +36,19 @@ function AddBloodPressure() {
         });
     },
   });
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleFormSubmit = () => {
+    setOpenDialog(false); // Close the dialog before submitting the form
+    formik.handleSubmit(); // Submit the form
+  };
 
   return (
     <Box
@@ -90,12 +102,32 @@ function AddBloodPressure() {
           error={formik.touched.measureDate && Boolean(formik.errors.measureDate)}
           helperText={formik.touched.measureDate && formik.errors.measureDate}
           InputLabelProps={{ shrink: true }}
-          inputProps={{ max: today }} // Set the max attribute to today's date
         />
-        <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
+        <Button fullWidth variant="contained" sx={{ mt: 2 }} onClick={handleOpenDialog}>
           Add Blood Pressure
         </Button>
       </Box>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Submission</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Please confirm that the information are correct?
+          </Typography>
+          <Typography>
+            Systolic Pressure: {formik.values.systolic}
+          </Typography>
+          <Typography>
+            Diastolic Pressure: {formik.values.diastolic}
+          </Typography>
+          <Typography>
+            Date: {new Date(formik.values.measureDate).toLocaleDateString("en-GB")}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={handleFormSubmit}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

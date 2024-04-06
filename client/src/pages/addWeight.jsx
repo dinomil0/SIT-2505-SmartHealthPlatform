@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Box, Typography, TextField, Button, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, Typography, TextField, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -27,6 +27,12 @@ function AddWeight() {
                 const { heightValue } = response.data; // Assuming heightValue is directly in response.data
                 console.log("Latest height from API:", heightValue);
                 setLatestHeight(heightValue || ""); // Set the latest height in state if available
+
+                // Update formik initialValues with latestHeight
+                formik.setValues({
+                    ...formik.values,
+                    heightValue: heightValue || "",
+                });
             } catch (error) {
                 console.error('Error fetching latest height:', error);
             }
@@ -41,7 +47,7 @@ function AddWeight() {
         initialValues: {
             NRIC: user.NRIC,
             weightValue: "",
-            heightValue: latestHeight, // Initialize height with latestHeight if available, otherwise empty string
+            heightValue: "", // Initialize height with empty string
             BMI: "", // BMI will be calculated dynamically
             measureDate: today, // Set today's date as the default date
         },
