@@ -26,6 +26,15 @@ app.use("/tutorial", tutorialRoute);
 const userRoute = require('./routes/user');
 app.use("/user", userRoute);
 
+const deviceRoute = require('./routes/device');
+app.use('/device', deviceRoute);
+
+const measurementRoute = require('./routes/measurement');
+app.use('/measurement', measurementRoute);
+
+const reminderRoute = require('./routes/reminder');
+app.use('/reminder', reminderRoute);
+
 
 const db = require("./models");
 

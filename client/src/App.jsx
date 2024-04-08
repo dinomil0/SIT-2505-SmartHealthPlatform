@@ -80,6 +80,11 @@ function App() {
                         >
                           <MenuItem component={Link} to="/profile">Profile</MenuItem>
                           <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                          <MenuItem onClick={() => { navigate('/addDevice')}}>Device integration</MenuItem>
+                      <MenuItem onClick={() => { navigate('/generateReport')}}>Health Report</MenuItem>
+                      <MenuItem onClick={() => { navigate('/addMeasurement')}}>Log measurement</MenuItem>
+                      <MenuItem onClick={() => { navigate('/configDevice')}}>Device config</MenuItem>
+                      <MenuItem onClick={() => { navigate('/addReminder')}}>Reminder scheduler</MenuItem>
                         </Menu>
                       </Grid>
                     </Grid>
@@ -97,6 +102,11 @@ function App() {
               <Route path={"/profile"} element={<Profile />} />
               <Route path="/addBloodPressure" element={<AddBloodPressure />} />
               <Route path="/addWeight" element={<AddWeight />} />
+              <Route path="/addDevice" element={<AddDevice />} />
+              <Route path="/addMeasurement" element={<AddMeasurement />} />
+              <Route path="/addReminder" element={<AddReminder />} />
+              <Route path="/configDevice" element={<DeviceConfig />} />
+              <Route path="/generateReport" element={<Report NRIC={user?.NRIC} />} />
             </Routes>
           </Container>
         </ThemeProvider>

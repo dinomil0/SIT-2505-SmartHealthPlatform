@@ -48,6 +48,7 @@ function Login() {
           localStorage.setItem("accessToken", res.data.accessToken);
           setUser(res.data.user);
           console.log(res.data);
+          localStorage.setItem('user', JSON.stringify(res.data.user))
           navigate("/Dashboard");
         })
         .catch(function (err) {
