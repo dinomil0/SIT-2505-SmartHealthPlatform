@@ -14,10 +14,16 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react
 import Home from './pages/Home'; // Import the Home component
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'; // Import the ArrowDropDownIcon
 
+import AddDevice from './pages/AddDevice';
+import AddMeasurement from './pages/AddMeasurement';
+import AddReminder from './pages/AddReminder';
+import Report from './pages/Report';
+import DeviceConfig from './pages/DeviceConfig';
+
 function App() {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -42,7 +48,7 @@ function App() {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-      <Router> {/* Ensure Router is set up properly */}
+      {/* <Router> Ensure Router is set up properly */}
         <ThemeProvider theme={MyTheme}>
           <AppBar position="static" className='AppBar'>
             <Container>
@@ -54,40 +60,40 @@ function App() {
                 </Link>
                 {user && (
                   // <Container>
-                    <Grid container alignItems="center" justifyContent='flex-end' >
-                      <Grid item >
-                        <Typography variant="body1" style={{ marginRight: '3px' }}>
-                         Welcome, {user.name}
-                        </Typography>
-                      </Grid>
-                      <Grid item >
-                        <IconButton
-                          edge="end"
-                          color="inherit"
-                          aria-label="menu"
-                          aria-controls="profile-menu"
-                          aria-haspopup="true"
-                          onClick={handleMenuOpen}
-                        >
-                          <ArrowDropDownIcon />
-                        </IconButton>
-                        <Menu
-                          id="profile-menu"
-                          anchorEl={anchorEl}
-                          keepMounted
-                          open={Boolean(anchorEl)}
-                          onClose={handleMenuClose}
-                        >
-                          <MenuItem component={Link} to="/profile">Profile</MenuItem>
-                          <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                          <MenuItem onClick={() => { navigate('/addDevice')}}>Device integration</MenuItem>
-                      <MenuItem onClick={() => { navigate('/generateReport')}}>Health Report</MenuItem>
-                      <MenuItem onClick={() => { navigate('/addMeasurement')}}>Log measurement</MenuItem>
-                      <MenuItem onClick={() => { navigate('/configDevice')}}>Device config</MenuItem>
-                      <MenuItem onClick={() => { navigate('/addReminder')}}>Reminder scheduler</MenuItem>
-                        </Menu>
-                      </Grid>
+                  <Grid container alignItems="center" justifyContent='flex-end' >
+                    <Grid item >
+                      <Typography variant="body1" style={{ marginRight: '3px' }}>
+                        Welcome, {user.name}
+                      </Typography>
                     </Grid>
+                    <Grid item >
+                      <IconButton
+                        edge="end"
+                        color="inherit"
+                        aria-label="menu"
+                        aria-controls="profile-menu"
+                        aria-haspopup="true"
+                        onClick={handleMenuOpen}
+                      >
+                        <ArrowDropDownIcon />
+                      </IconButton>
+                      <Menu
+                        id="profile-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                      >
+                        <MenuItem component={Link} to="/profile">Profile</MenuItem>
+                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                        <MenuItem onClick={() => { navigate('/addDevice') }}>Device integration</MenuItem>
+                        <MenuItem onClick={() => { navigate('/generateReport') }}>Health Report</MenuItem>
+                        <MenuItem onClick={() => { navigate('/addMeasurement') }}>Log measurement</MenuItem>
+                        <MenuItem onClick={() => { navigate('/configDevice') }}>Device config</MenuItem>
+                        <MenuItem onClick={() => { navigate('/addReminder') }}>Reminder scheduler</MenuItem>
+                      </Menu>
+                    </Grid>
+                  </Grid>
                   // </Container>
                 )}
               </Toolbar>
@@ -110,7 +116,7 @@ function App() {
             </Routes>
           </Container>
         </ThemeProvider>
-      </Router>
+      {/* </Router> */}
     </UserContext.Provider>
   );
 }

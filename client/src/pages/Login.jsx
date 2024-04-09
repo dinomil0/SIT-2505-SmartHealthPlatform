@@ -101,10 +101,6 @@ function Login() {
           error={formik.touched.password && Boolean(formik.errors.password)}
           helperText={formik.touched.password && formik.errors.password}
         />
-        {/* Login button */}
-        <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
-          Login
-        </Button>
         {/* Forgot Password link */}
         <Link
           component={Link}
@@ -113,6 +109,11 @@ function Login() {
           sx={{ mt: 1, color: "#007bff", fontWeight: "bold", textDecoration: "underline" }}>
           Forgot Password?
         </Link>
+        {/* Login button */}
+        <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
+          Login
+        </Button>
+        
         {/* Link to Signup page */}
         <Link to="/signup" style={{ textDecoration: "none" }}>
           <Typography variant="body2" sx={{ mt: 1, color: "#007bff", fontWeight: "bold", textDecoration: "underline" }}>
