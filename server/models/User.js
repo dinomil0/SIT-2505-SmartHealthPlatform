@@ -51,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: "userid",
             onDelete: "cascade"
         });
+        User.hasOne(models.dashboardSetting, {
+            foreignKey: "userid",
+            onDelete: "cascade"
+        });
     };
 
     return User;

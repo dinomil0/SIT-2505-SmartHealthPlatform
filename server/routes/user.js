@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const bcrypt = require("bcrypt");
-const { User, bloodPressure, Weight } = require("../models");
+const { User, bloodPressure, Weight, dashboardSetting } = require("../models");
 const yup = require("yup");
 const { sign } = require("jsonwebtoken");
 require("dotenv").config();
 const { validateToken } = require("../middlewares/auth");
+const e = require("express");
 
 
 const emailRegex = /^[\w-]+(?:\.[\w-]+)*@(?:[\w-]+\.)+[a-zA-Z]{2,7}$/;
@@ -109,7 +110,7 @@ router.post("/login", async (req, res) => {
       NRIC: user.NRIC,
       email: user.email,
       name: user.name,
-      phone: user.phone,
+      phone: user.phoneNo,
       address: user.address,
       dob: user.DOB
     };
@@ -210,7 +211,7 @@ router.get("/getWeight/:nric", async (req, res) => {
 //get user height
 router.get("/getUserHeight/:nric", async (req, res) => {
   const userNRIC = req.params.nric;
-  
+
   try {
     const latestHeightData = await Weight.findOne({
       where: { NRIC: userNRIC },
@@ -228,6 +229,68 @@ router.get("/getUserHeight/:nric", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch height data." });
   }
 });
+
+//get dashboard settings
+router.get("/getDashboardSetting/:nric", async (req, res) => {
+  const userNRIC = req.params.nric;
+
+  try {
+    const userDashboardSetting = await dashboardSetting.findOne({
+      where: { NRIC: userNRIC },
+      attributes: ['weightChange', 'muscleMassChange', 'bodyFatChange'],
+    });
+
+    if (userDashboardSetting) {
+      res.json({ dashboardSetting: userDashboardSetting });
+    } else {
+      res.status(404).json({ message: "No dashboard setting found for the user." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch dashboard setting." });
+  }
+});
+
+//add/update dasdhboard setting
+router.put("/updateDashboardSetting/:nric", async (req, res) => {
+  const userNRIC = req.params.nric;
+  const { weightChange, muscleMassChange, bodyFatChange } = req.body;
+
+  let newWeightChange;
+  let newMuscleMassChange;
+  let newBodyFatChange;
+
+  // Checking if any of these are null or undefined and not false
+  if (weightChange !== true && weightChange !== false) { newWeightChange = true; } else { newWeightChange = weightChange; }
+  if (muscleMassChange !== true && muscleMassChange !== false) { newMuscleMassChange = true; } else { newMuscleMassChange = muscleMassChange; }
+  if (bodyFatChange !== true && bodyFatChange !== false) { newBodyFatChange = true; } else { newBodyFatChange = bodyFatChange; }
+
+  try {
+    let updatedSetting = null;
+
+    const existingSetting = await dashboardSetting.findOne({ where: { NRIC: userNRIC } });
+
+    if (existingSetting) {
+      // Update existing setting
+      updatedSetting = await existingSetting.update({ weightChange: newWeightChange, muscleMassChange: newMuscleMassChange, bodyFatChange: newBodyFatChange });
+    } else {
+      // Create new setting if not found
+      updatedSetting = await dashboardSetting.create({
+        NRIC: userNRIC,
+        weightChange: newWeightChange,
+        muscleMassChange: newMuscleMassChange,
+        bodyFatChange: newBodyFatChange,
+      });
+    }
+
+    res.status(200).json({ message: "Dashboard setting updated successfully.", dashboardSetting: updatedSetting });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update dashboard setting." });
+  }
+});
+
+
 
 
 // Add weight data
@@ -276,16 +339,16 @@ router.get("getUserByID/:id", validateToken, async (req, res) => {
   res.json(user);
 });
 
-router.put("/updateProfile/:id", validateToken, async (req, res) => {
-  let userid = req.params.id;
+router.put("/updateProfile/:NRIC", async (req, res) => {
+  let NRIC = req.params.NRIC;
 
-  let user = await User.findByPk(userid);
+  let user = await User.findOne(NRIC);
   if (!user) {
     res.sendStatus(404);
     return;
   }
 
-  if (user.id != userid) {
+  if (user.NRIC != NRIC) {
     res.sendStatus(403);
     return;
   }
@@ -304,14 +367,9 @@ router.put("/updateProfile/:id", validateToken, async (req, res) => {
     data = await validationSchema.validate(data, { abortEarly: false });
 
     let user = await User.update(data, {
-      where: { id: userid }
+      where: { NRIC: NRIC }
     });
 
-    // update user
-    let result = await User.update(data,
-      {
-        where: { id: userid }
-      });
     res.json({
       message: `Profile of ${data.name} was updated successfully.`,
     });

@@ -87,8 +87,6 @@ const BloodPressureGraph = ({ NRIC }) => {
                 const response = await http.get(`user/getBloodPressure/${NRIC}`);
                 const bloodPressureData = response.data;
 
-                console.log('Blood Pressure Data:', bloodPressureData);
-
                 const labels = [];
                 const systolicData = [];
                 const diastolicData = [];
@@ -109,10 +107,6 @@ const BloodPressureGraph = ({ NRIC }) => {
                         diastolicData.push(diastolicValue);
                     }
                 }
-
-                console.log('Labels:', labels);
-                console.log('Systolic Data:', systolicData);
-                console.log('Diastolic Data:', diastolicData);
 
                 setChartData({
                     labels,
@@ -148,8 +142,6 @@ const BloodPressureGraph = ({ NRIC }) => {
                         },
                     },
                 ];
-
-                console.log('Annotations:', annotations);
 
                 setChartOptions({
                     ...chartOptions,
@@ -196,19 +188,12 @@ const BloodPressureGraph = ({ NRIC }) => {
 
 
     // Calculate blood pressure category based on the last data point
-    console.log('chartData.datasets:', chartData.datasets);
     const lastRecordSystolic = chartData.datasets[0].data[chartData.datasets[0].data.length - 1];
     const lastRecordDiastolic = chartData.datasets[1].data[chartData.datasets[1].data.length - 1];
-    console.log('Last Record Systolic:', lastRecordSystolic);
-    console.log('Last Record Diastolic:', lastRecordDiastolic);
 
     const lastSystolic = lastRecordSystolic || 0;
     const lastDiastolic = lastRecordDiastolic || 0;
-    console.log("bp check", lastSystolic, lastDiastolic);
     const { category: bloodPressureCategory, color: categoryColor } = categorizeBloodPressure(lastSystolic, lastDiastolic);
-
-    console.log('Blood Pressure Category:', bloodPressureCategory);
-    console.log('Category Color:', categoryColor);
 
     return (
         <Paper>

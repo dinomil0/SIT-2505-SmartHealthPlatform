@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/dashboard';
 import AddBloodPressure from './pages/addBloodPressure';
 import AddWeight from './pages/addWeight';
+import Profile from "./pages/profile";
 import UserContext from "./contexts/UserContext";
 import http from "./http";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
@@ -35,10 +36,8 @@ function App() {
   };
 
   const handleLogout = () => {
-    // Perform logout logic here
-    setUser(null);
-    setAnchorEl(null);
-    // navigate('/'); // Use navigate within the Router context
+    localStorage.clear();
+    window.location = "/";
   };
 
   return (
@@ -79,7 +78,7 @@ function App() {
                           open={Boolean(anchorEl)}
                           onClose={handleMenuClose}
                         >
-                          <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+                          <MenuItem component={Link} to="/profile">Profile</MenuItem>
                           <MenuItem onClick={handleLogout}>Logout</MenuItem>
                         </Menu>
                       </Grid>
@@ -95,6 +94,7 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path={"/profile"} element={<Profile />} />
               <Route path="/addBloodPressure" element={<AddBloodPressure />} />
               <Route path="/addWeight" element={<AddWeight />} />
             </Routes>
